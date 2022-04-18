@@ -1,46 +1,33 @@
 <?php
-    $fields = [
-        'title' => [
-            'label' => 'Название',
-            'type' => 'input'
-        ],
-        'preview_text' => [
-            'label' => 'Текст превью',
-            'type' => 'textarea'
-        ],
-        'detail_text' => [
-            'label' => 'Детальный текст',
-            'type' => 'textarea'
-        ],
-        'image' => [
-            'label' => 'Изображение',
-            'type' => 'file'
-        ],
-    ];
+$fields = [
+    'commenter' => [
+        'label' => 'Представьтесь',
+        'type' => 'input'
+    ],
+    'text' => [
+        'label' => 'Ваше мнение',
+        'type' => 'textarea'
+    ]
+];
 
-    $errors = [];
-    foreach ($fields as $key => $field){
-        if(isset($_REQUEST[$key]) && $_REQUEST[$key]==''){
-            $errors[] = $key;
-        }
+$errors = [];
+foreach ($fields as $key => $field){
+    if(isset($_POST[$key]) && $_POST[$key]==''){
+        $errors[] = $key;
     }
+}
 
-    include "core/db.php";
+include_once "core/db.php";
 
-    if(!$errors && $_REQUEST){
-        $file_url = '';
-        if($_FILES['image']['name']){
-            $file_url = 'news_images/'.$_FILES['image']['name'];
-            move_uploaded_file($_FILES['image']['tmp_name'],$file_url);
-            $file_url='/'.$file_url;
-        }
+if(!$errors && $_POST){
+    $result = createComment($newsDetailed['id'],$_POST);
+}
 
-        $result = create($_REQUEST,$file_url);
-    }
 
 ?>
 
-<form action="/create.php" method="post" enctype="multipart/form-data">
+<h5>Добавить комментарий</h5>
+<form method="post" enctype="multipart/form-data">
     <?php foreach ($fields as $key => $field) {?>
         <?php if($field['type'] == 'input'){?>
             <div class="mb-3">
@@ -60,12 +47,12 @@
         <?php }?>
     <?php }?>
 
-    <button type="submit" class="btn btn-primary">Создать</button>
+    <button type="submit" class="btn btn-primary">Комментировать</button>
 </form>
 
 <?php if(isset($result) && $result == true){?>
     <div class="alert alert-success" role="alert">
-        Новость успешно создана!
+        Комментарий добавлен!
     </div>
 <?php }?>
 

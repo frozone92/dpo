@@ -7,6 +7,8 @@ $pdo = new \PDO(
     "test123"
 );
 
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
 $res = $pdo->query('select * from news;');
 
 $newsList = [];
@@ -39,7 +41,7 @@ function search($searchString){
 }
 
 
-function create($fields){
+function create($fields,$image = ''){
     global $pdo;
 
     $sql = 'INSERT INTO news (';
@@ -63,6 +65,10 @@ function create($fields){
         $values.= ',"'.authUser()['login'].'"';
     }
 
+    if($image!=''){
+        $sql.= ',image_url';
+        $values.= ',"'.$image.'"';
+    }
 
     $values.= ')';
 
@@ -70,6 +76,51 @@ function create($fields){
 
     return $pdo->exec($sql);
 }
+
+function createComment($articleId,$fields){
+    global $pdo;
+
+    $sql = 'INSERT INTO comments (';
+
+    $values = 'VALUES (';
+
+    $i = 0;
+    foreach ($fields as $key => $value){
+        if($i!=0){
+            $sql.=',';
+            $values.=',';
+        }
+        $sql.= $key;
+        $values.='"'.$value.'"';
+
+        $i++;
+    }
+
+    $sql.= ',article_id';
+    $values.= ',"'.$articleId.'"';
+
+    $values.= ')';
+
+    $sql.= ') '.$values;
+
+    return $pdo->exec($sql);
+}
+function getArticleComments($articleId){
+    if(!isset($articleId)){
+        return false;
+    }
+
+    global $pdo;
+    $res = $pdo->query('select * from comments where `article_id` = '.$articleId.';');
+
+    $comments = [];
+    while ($comment = $res->fetch()){
+        $comments[] = $comment;
+    }
+
+    return $comments;
+}
+
 
 function getUser($login){
     if(!isset($login)){

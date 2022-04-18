@@ -2,6 +2,9 @@
     <?php foreach ($newsList as $newsItem){?>
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
+                <?php if($newsItem['image_url']){?>
+                    <img style="max-width: 300px;" src="<?php echo $newsItem['image_url']?>"/>
+                <?php }?>
                 <div class="fw-bold">
                     <a href="/news.php?id=<?php echo $newsItem['id']?>">
                         <?php echo $newsItem['title']?>
